@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from ninja import NinjaAPI
 from ninja.errors import ValidationError
 
-from .models import BankItem, Player
+from .models import BankItem, Player, BankItemPlayer
 from .schemas import BankItemSchema
 
 
@@ -16,20 +16,14 @@ def create_bank_items(request, data: BankItemSchema):
 
 
     for item_data in data.bank_items:
-        print(item_data)
-        # Get or create the BankItem instance based on the item_id
-        try:
-            bank_item = BankItem.objects.get(item_id=item_data.id)
-        except ObjectDoesNotExist:
-            bank_item = BankItem.objects.create(name=item_data.name, item_id=item_data.id, quantity=item_data.quantity)
+        bank_item, _ = BankItem.objects.get_or_create(name=item_data.name, item_id=item_data.id)
 
-        # Update the quantity and save the BankItem instance
-        bank_item.quantity = item_data.quantity
-        bank_item.save()
-
-        # Add the bank item to the player's bank items
-        player.bank_items.add(bank_item)
-
+        # Update the quantity on the intermediate model
+        bank_item_player, created = BankItemPlayer.objects.update_or_create(
+            player=player,
+            bank_item=bank_item,
+            defaults={'quantity': item_data.quantity}
+        )
     return {"detail": "Bank items saved successfully"}
 
 @api.exception_handler(ValidationError)

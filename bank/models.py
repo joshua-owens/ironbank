@@ -6,5 +6,11 @@ class Player(models.Model):
 class BankItem(models.Model):
     item_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=255)
-    quantity = models.IntegerField()
     players = models.ManyToManyField(Player, related_name="bank_items")
+
+
+class BankItemPlayer(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    bank_item = models.ForeignKey(BankItem, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
