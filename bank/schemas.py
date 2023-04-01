@@ -8,10 +8,6 @@ class BankItemIn(BaseModel):
     quantity: int
     name: str
 
-class BankItemsIn(BaseModel):
+class BankItemSchema(BaseModel):
     bank_items: List[BankItemIn]
-
-
-class PlayerBankItemIn(BaseModel):
-    bank_item: BankItemIn
     player_name: str

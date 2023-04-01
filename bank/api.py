@@ -4,15 +4,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from ninja import NinjaAPI
 from ninja.errors import ValidationError
 
-from .models import BankItem
-from .schemas import PlayerBankItemIn, BankItemsIn
+from .models import BankItem, Player
+from .schemas import BankItemSchema
 
 
 api = NinjaAPI()
 
 @api.post("/bank-items/")
-def create_bank_items(request, data: BankItemsIn):
-    # player, _ = Player.objects.get_or_create(name=player_name)
+def create_bank_items(request, data: BankItemSchema):
+    player, _ = Player.objects.get_or_create(name=data.player_name)
 
 
     for item_data in data.bank_items:
@@ -28,7 +28,7 @@ def create_bank_items(request, data: BankItemsIn):
         bank_item.save()
 
         # Add the bank item to the player's bank items
-        #player.bank_items.add(bank_item)
+        player.bank_items.add(bank_item)
 
     return {"detail": "Bank items saved successfully"}
 
